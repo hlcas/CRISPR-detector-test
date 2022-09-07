@@ -84,7 +84,7 @@ os.chdir(sample)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 rq = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
-fh = logging.FileHandler('CRISPRdetectorMap.log', mode='w')
+fh = logging.FileHandler('RUNNING_mapping.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
@@ -96,7 +96,7 @@ threads = str(args.threads)
 def format_file(x,y,z):
 	if x not in y:
 		if x not in str(Seq(y).reverse_complement()):
-			logger.error('Site '+z+' find conflicts , gRNA not in amplicon seq.\n')
+			logger.error('Site '+z+' find conflicts , gRNA not in amplicon sequence.\n')
 			sys.exit('Please input the right sequence(s) and submit agian.')
 		else:
 			return str(Seq(y).reverse_complement())
