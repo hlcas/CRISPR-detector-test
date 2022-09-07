@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorMAP.py
+#	   File Name: CRISPRdetectorAMPmap.py
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -22,7 +22,7 @@ description = '''
 ------------------------------------------------------------------------------------------------------------------------
 This script is designed to map single amplicon & pooled amplicons sequencing data to amplicons.
 Usage:
-python CRISPRdetectorMAP.py  
+python CRISPRdetectorAMPmap.py  
 --sample: sample name & output directory name [required]
 --e1: treatment group fq1 path [required]
 --e2: treatment group fq2 path [optional]
