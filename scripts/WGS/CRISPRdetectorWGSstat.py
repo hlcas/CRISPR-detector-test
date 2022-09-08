@@ -60,7 +60,7 @@ os.chdir(sample)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 rq = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
-fh = logging.FileHandler('RUNNING.log', mode='w')
+fh = logging.FileHandler('RUNNING_summary.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
@@ -112,13 +112,6 @@ def extract_value(x,y,z):
 	else:
 		return 0
 
-# Check if the variant in the BED defined region
-def inter(x0,x1,x2,x3):
-	if len(set(range(x0,x1+1)).intersection(set(range(x2,x3+1)))) != 0:
-		return 1
-	else:
-		return 0
-
 def chi_test(xReadHash,yReadHash,xReadNums,yReadNums):
 	xSplit = xReadHash.split('|')
 	ySplit = yReadHash.split('|')
@@ -133,6 +126,13 @@ def chi_test(xReadHash,yReadHash,xReadNums,yReadNums):
 			return stats.chi2_contingency([[a0,a2],[a1,a3]],correction=True)[1]
 		else:
 			return stats.chi2_contingency([[a0,a2],[a1,a3]],correction=False)[1]
+
+# Check if the variant in the BED defined region
+def inter(x,y,z):
+	for regionK in Chr_POS[z]:
+		if len(set(range(x,y+1)) & set(Chr_POS[z][regionK])) != 0:
+			return regionK
+	return 0
 
 vcf = pd.read_csv('temp/split.vcf',sep='\t',header=None,comment='#')
 vcflencheck(vcf,'No variants called!')
@@ -155,10 +155,6 @@ dfin = pd.read_csv('temp/anno.avinput',sep='\t',header=None)
 dfin.columns = ['#CHROM','Start','End','Ref','Alt','tmp1','tmp2','tmp3']
 dfin = dfin[['#CHROM','Start','End','Ref','Alt']]
 
-# ReadHash
-for i in sample_list:
-	dfin[i+'_ReadHash'] = vcf[i].apply(lambda x:x[4:])
-
 # window.bed
 df_window = pd.read_csv(bed,sep='\t',header=None)
 df_window.columns = ['#CHROM','window_start','window_end','region']
@@ -172,13 +168,33 @@ vcflencheck(dfin,'No variants on BED file defined chromosome.')
 if len(sample_list) == 2:
 	df_window = pd.merge(df_window,mapdf,on='region',how='left')
 	
-dfin = pd.merge(dfin,df_window,on='#CHROM',how='outer')
-dfin['Overlap'] = dfin.apply(lambda row:inter(row['Start'],row['End'],row['window_start'],row['window_end']),axis=1)
-dfin = dfin[dfin['Overlap'] == 1]
+#dfin = pd.merge(dfin,df_window,on='#CHROM',how='outer')
+
+# Check if the variant in the BED defined region
+Chr_POS = {}
+for i in range(len(df_window)):
+	chrI = df_window['#CHROM'].values[i]
+	regionI = df_window['region'].values[i]
+	startI = df_window['window_start'].values[i]
+	endI = df_window['window_end'].values[i]
+	if chrI not in Chr_POS:
+		Chr_POS[chrI] = {}
+	if regionI not in Chr_POS[chrI]:
+		Chr_POS[chrI][regionI] = []
+	for j in range(startI,endI+1):
+		Chr_POS[chrI][regionI].append(j)
+
+dfin['region'] = dfin.apply(lambda row:inter(row['Start'],row['End'],row['#CHROM']),axis=1)
+dfin = dfin[dfin['region'] != 0]
 
 vcflencheck(dfin,'No variants on BED file defined regions.')
 
-dfin = dfin.drop(['window_start','window_end','Overlap'],axis=1)
+dfin = pd.merge(dfin,mapdf,on='region',how='left')
+dfin.to_csv('tmp.csv',sep='\t',index=None)
+
+# ReadHash
+for i in sample_list:
+	dfin[i+'_ReadHash'] = vcf[i].apply(lambda x:x[4:])
 
 if len(sample_list) == 2:
 	#dfin.to_csv('dfin2.csv',sep='\t',index=None)
@@ -357,3 +373,5 @@ for i in sample_list:
 
 mapdf.to_csv('out_result_summary.txt',sep='\t',index=None)
 
+time1=time.time()
+logger.info('Finished! Running time: %s seconds'%(round(time1-time0,2))+'.')
