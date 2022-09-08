@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorAMPmap.py
+#	   File Name: CRISPRdetectorMAP.py
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -22,7 +22,7 @@ description = '''
 ------------------------------------------------------------------------------------------------------------------------
 This script is designed to map single amplicon & pooled amplicons sequencing data to amplicons.
 Usage:
-python CRISPRdetectorAMPmap.py  
+python CRISPRdetectorMAP.py  
 --sample: sample name & output directory name [required]
 --e1: treatment group fq1 path [required]
 --e2: treatment group fq2 path [optional]
@@ -43,6 +43,8 @@ parse.add_argument("--sample",help="sample name & output dir",required=True)
 parse.add_argument("--amplicons_file", help="Amplicons description file. This file is a tab-delimited text file with up to 5 columns (2 required)",required=True)
 parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--threads",  help="number of threads[15]",default=15,type=int)
+parse.add_argument("--cleavage_offset", help='Center of quantification window to use within respect to the 3-end of the provided sgRNA sequence[-3]',default=-3,type=int)
+parse.add_argument("--window_size", help="Defines the size (in bp) of the quantification window extending from the position specified by the cleavage_offset parameter in relation to the provided guide RNA sequence[0], 0 means whole amplicon analysis",default=0,type=int)
  
 args = parse.parse_args()
 time0 =time.time()
@@ -91,17 +93,21 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 threads = str(args.threads)
+window_size = args.window_size
+cleavage_offset = args.cleavage_offset
 
 # Check if the gRNA sequences in the amplicon sequences
 def format_file(x,y,z):
 	if x not in y:
 		if x not in str(Seq(y).reverse_complement()):
-			logger.error('Site '+z+' find conflicts , gRNA not in amplicon sequence.\n')
+			logger.error('Site '+z+' find conflicts , gRNA not in amplicon seq.\n')
 			sys.exit('Please input the right sequence(s) and submit agian.')
 		else:
 			return str(Seq(y).reverse_complement())
 	else:
 		return y
+
+dic_window = {}
 
 if len(amplicons_file.columns) == 2:
 	amplicons_file.columns = ['amplicon','amplicon_seq']
@@ -114,7 +120,27 @@ elif len(amplicons_file.columns) == 3:
 
 	with open('temp/sgRNAs.fa','w') as f:
 		for i in range(len(amplicons_file)):
-			f.write('>'+amplicons_file['amplicon'].values[i]+'\n'+amplicons_file['sgrna_seq'].values[i]+'\n')
+			amplicon_name = amplicons_file['amplicon'].values[i]
+			sgrna_seq = amplicons_file['sgrna_seq'].values[i]
+			if window_size != 0:
+				amplicon_seq = amplicons_file['amplicon_seq'].values[i]
+				sgrna_start = amplicon_seq.find(sgrna_seq) + 1
+				sgrna_end = sgrna_start + len(sgrna_seq) - 1
+				window_start = max(sgrna_end - window_size + cleavage_offset + 1,1)
+				window_end = min(window_start + 2*window_size -1,len(amplicon_seq))  
+				dic_window[amplicon_name] = [window_start,window_end]
+			f.write('>'+amplicons_file['amplicon'].values[i]+'\n'+sgrna_seq+'\n')
+
+if window_size == 0:
+	for i in range(len(amplicons_file)):
+		amplicon_name = amplicons_file['amplicon'].values[i]
+		amplicon_seq = amplicons_file['amplicon_seq'].values[i]
+		dic_window[amplicon_name] = [1,len(amplicon_seq)]
+
+with open('temp/window.bed','w') as f:
+	for i in dic_window.keys():
+		start_end = dic_window[i]
+		f.write(i+'\t'+str(start_end[0])+'\t'+str(start_end[1])+'\t'+i+'\n')
 
 with open('temp/amplicon_seq.fa','w') as f:
 	for i in range(len(amplicons_file)):
@@ -148,7 +174,7 @@ if args.c1 != None:
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	else:
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
-	logger.info('Finished: mapping control group fastqs to amplicon(s) using minimap2.')
+	logger.info('Finished : mapping control group fastqs to amplicon(s) using minimap2.')
 
 time1=time.time()
 logger.info('Finished! Running time: %s seconds'%(round(time1-time0,2))+'.')
