@@ -25,7 +25,6 @@ This script is designed to call variants for single amplicon & pooled amplicons 
 Usage:
 python CRISPRdetectorCALL.py  
 --sample: sample name & output directory name [required]
---o: output path [default:'.']
 ------------------------------------------------------------------------------------------------------------------------
 '''
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
@@ -77,20 +76,21 @@ elif os.path.exists('temp/'+sample+'.control.bam'):
 else:
 	bam_c = 0
 
-# Paired sample: treatment & control
+
+vcf_out = 'temp/raw.vcf.gz'
+
 if bam_c != 0:
 	# Call variants
-	vcf_out = 'temp/raw.paired.vcf.gz'
+	logger.info('sentieon driver -i '+bam_t+ ' -i '+bam_c+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out)
 	os.system('sentieon driver -i '+bam_t+ ' -i '+bam_c+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out+' && sync')
 	if bed != 'None':
 		# Number of reads
 		logger.info('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt')
 		os.system('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt && sync')
-		logger.info('sentieon driver -i '+bam_c+' -r '+fasta+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_control.txt')
+		logger.info('sentieon driver -i '+bam_c+' -r '+fasta+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_control.txt')
 		os.system('sentieon driver -i '+bam_c+' -r '+fasta+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_control.txt && sync')
 # Single sample 
 else:
-	vcf_out = 'temp/raw.treatment.vcf.gz'
 	if bed != None:
 		# Call variants and calculate number of reads mapped
 		logger.info('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt')
