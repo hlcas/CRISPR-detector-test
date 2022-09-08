@@ -142,6 +142,16 @@ if len(sample_list) == 2:
 else:
 	vcf.columns = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','treatment']
 
+# window.bed
+df_window = pd.read_csv(bed,sep='\t',header=None)
+df_window.columns = ['#CHROM','window_start','window_end','region']
+df_window = df_window[df_window['region'].isin(loci_high_reads)]
+
+# Filt out reads not on BED file defined chromosome
+window_chr = df_window['#CHROM'].unique()
+vcf = vcf[vcf['#CHROM'].isin(window_chr)]
+vcflencheck(vcf,'No variants on BED file defined chromosome.')
+
 # GT:ReadHash
 vcf['FORMAT'] = 'GT:ReadHash'
 for i in sample_list:
@@ -151,24 +161,8 @@ vcf.to_csv('temp/anno.vcf',sep='\t',index=None)
 os.system('convert2annovar.pl -format vcf4 temp/anno.vcf > temp/anno.avinput && sync')
 
 dfin = pd.read_csv('temp/anno.avinput',sep='\t',header=None)
-
 dfin.columns = ['#CHROM','Start','End','Ref','Alt','tmp1','tmp2','tmp3']
 dfin = dfin[['#CHROM','Start','End','Ref','Alt']]
-
-# window.bed
-df_window = pd.read_csv(bed,sep='\t',header=None)
-df_window.columns = ['#CHROM','window_start','window_end','region']
-df_window = df_window[df_window['region'].isin(loci_high_reads)]
-
-# Filt out reads not on BED file defined chromosome
-window_chr = df_window['#CHROM'].unique()
-dfin = dfin[dfin['#CHROM'].isin(window_chr)]
-vcflencheck(dfin,'No variants on BED file defined chromosome.')
-
-if len(sample_list) == 2:
-	df_window = pd.merge(df_window,mapdf,on='region',how='left')
-	
-#dfin = pd.merge(dfin,df_window,on='#CHROM',how='outer')
 
 # Check if the variant in the BED defined region
 Chr_POS = {}
