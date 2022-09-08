@@ -26,10 +26,6 @@ Usage:
 python CRISPRdetectorCALL.py  
 --sample: sample name & output directory name [required]
 --o: output path [default:'.']
---threads: number of threads to run sentieon minimap2 & driver module [default:1] 
---cleavage_offset: center of quantification window to use within respect to the 3-end of the provided sgRNA sequence [default:-3]
---window_size: defines the size (in bp) of the quantification window extending from the position specified by the cleavage_offset parameter in relation to the provided guide RNA sequence, 0 means whole amplicon analysis [default:0]
-
 ------------------------------------------------------------------------------------------------------------------------
 '''
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
@@ -56,7 +52,7 @@ os.chdir(sample)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 rq = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
-fh = logging.FileHandler('CRISPRdetectorCALL.log', mode='w')
+fh = logging.FileHandler('RUNNING_calling.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
