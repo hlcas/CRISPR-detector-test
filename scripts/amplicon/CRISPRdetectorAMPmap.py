@@ -125,13 +125,13 @@ os.system('samtools faidx temp/amplicon_seq.fa && sync')
 
 logger.info('Mapping treatment group fastqs to amplicon(s) using minimap2.')
 if args.e2 != None:
-	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.tmp.bam -t '+threads+' --sam2bam -i - && sync')
+	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 else:
-	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.tmp.bam -t '+threads+' --sam2bam -i - && sync')
+	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 logger.info('Finished : mapping treatment group fastqs to amplicon(s) using minimap2.')
 
 # Q30 %
-os.system('sentieon driver -i temp/'+sample+'.tmp.bam -r temp/amplicon_seq.fa --algo QualityYield temp/base_quality_metrics.txt && sync')
+os.system('sentieon driver -i temp/'+sample+'.bam -r temp/amplicon_seq.fa --algo QualityYield temp/base_quality_metrics.txt && sync')
 qydf = pd.read_csv('temp/base_quality_metrics.txt',sep='\t',comment='#')
 q30 = round(qydf['Q30_BASES'].values[0]*100/qydf['TOTAL_BASES'].values[0],2)
 logger.info('%Q30: The percentage of bases with a quality score of 30 or higher, respectively : '+str(q30)+'%.')
@@ -145,12 +145,10 @@ if q30 < 75:
 if args.c1 != None:
 	logger.info('Mapping control group fastqs to amplicon(s) using minimap2.')
 	if args.c2 != None:
-		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.tmp.bam -t '+threads+' --sam2bam -i - && sync')
+		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	else:
-		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.tmp.bam -t '+threads+' --sam2bam -i - && sync')
-	os.system('samtools idxstats temp/'+sample+'.control.tmp.bam > temp/control.mapping.tab && sync')
-	logger.info('Finished : mapping control group fastqs to amplicon(s) using minimap2.')
+		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
+	logger.info('Finished: mapping control group fastqs to amplicon(s) using minimap2.')
 
 time1=time.time()
 logger.info('Finished! Running time: %s seconds'%(round(time1-time0,2))+'.')
-
