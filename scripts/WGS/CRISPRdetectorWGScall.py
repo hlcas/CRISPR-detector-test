@@ -100,10 +100,6 @@ else:
 		logger.info('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out)
 		os.system('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out+' && sync')
 
-logger.info('bcftools norm -m- '+vcf_out+' > temp/split.vcf')
-os.system('bcftools norm -m- '+vcf_out+' > temp/split.vcf && sync')
-
-
 logger.info('Finished: variants called.')
 
 time1=time.time()
