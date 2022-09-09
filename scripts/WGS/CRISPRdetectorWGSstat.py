@@ -7,7 +7,7 @@
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
 #-------------------------------------------------
-'''
+#'''
 
 import os
 import sys
@@ -134,8 +134,7 @@ def inter(x,y,z):
 			return regionK
 	return 0
 
-vcf = pd.read_csv('temp/split.vcf',sep='\t',header=None,comment='#')
-vcflencheck(vcf,'No variants called!')
+vcf = pd.read_csv('temp/raw.vcf.gz',sep='\t',header=None,comment='#',compression='gzip')
 
 if len(sample_list) == 2:
 	vcf.columns = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','treatment','control']
@@ -149,20 +148,49 @@ df_window = df_window[df_window['region'].isin(loci_high_reads)]
 
 # Filt out reads not on BED file defined chromosome
 window_chr = df_window['#CHROM'].unique()
+
 vcf = vcf[vcf['#CHROM'].isin(window_chr)]
 vcflencheck(vcf,'No variants on BED file defined chromosome.')
 
 # GT:ReadHash
 vcf['FORMAT'] = 'GT:ReadHash'
-for i in sample_list:
-	vcf[i] = vcf[i].apply(lambda x:'0/1:'+x.split(':')[-1])
+for i in sample_list:    
+	vcf[i] = vcf[i].apply(lambda x:x.split(':')[-1])
 
-vcf.to_csv('temp/anno.vcf',sep='\t',index=None)
-os.system('convert2annovar.pl -format vcf4 temp/anno.vcf > temp/anno.avinput && sync')
+with open('temp/split.vcf','w') as f:
+	for i in range(len(vcf)):
+		chrx = vcf['#CHROM'].values[i]
+		pos = str(vcf['POS'].values[i])
+		ref = vcf['REF'].values[i]
+		alt = vcf['ALT'].values[i].split(',')
+		treadhash = vcf['treatment'].values[i].split(',')
+		if 'N' not in ref:
+			if len(sample_list) == 2:
+				creadhash = vcf['control'].values[i].split(',')
+				for j in range(len(alt)):
+					if ('N' not in alt[j]) or (alt[j] == '<NON_REF>'):
+						f.write(chrx+'\t'+pos+'\t.\t'+ref+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\t0/1:'+creadhash[j]+'\n')
+			else:
+				for j in range(len(alt)):
+					if ('N' not in alt[j]) or (alt[j] == '<NON_REF>'):
+						f.write(chrx+'\t'+pos+'\t.\t'+ref+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\n')
+
+vcf = pd.read_csv('temp/split.vcf',sep='\t',header=None,comment='#')
+
+if len(sample_list) == 2:
+	vcf.columns = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','treatment','control']
+else:
+	vcf.columns = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','treatment']
+
+os.system('convert2annovar.pl -format vcf4 temp/split.vcf > temp/anno.avinput && sync')
 
 dfin = pd.read_csv('temp/anno.avinput',sep='\t',header=None)
 dfin.columns = ['#CHROM','Start','End','Ref','Alt','tmp1','tmp2','tmp3']
 dfin = dfin[['#CHROM','Start','End','Ref','Alt']]
+
+# ReadHash
+for i in sample_list:
+	dfin[i+'_ReadHash'] = vcf[i].apply(lambda x:x[4:])
 
 # Check if the variant in the BED defined region
 Chr_POS = {}
@@ -180,15 +208,10 @@ for i in range(len(df_window)):
 
 dfin['region'] = dfin.apply(lambda row:inter(row['Start'],row['End'],row['#CHROM']),axis=1)
 dfin = dfin[dfin['region'] != 0]
-
 vcflencheck(dfin,'No variants on BED file defined regions.')
 
 dfin = pd.merge(dfin,mapdf,on='region',how='left')
 dfin.to_csv('tmp.csv',sep='\t',index=None)
-
-# ReadHash
-for i in sample_list:
-	dfin[i+'_ReadHash'] = vcf[i].apply(lambda x:x[4:])
 
 if len(sample_list) == 2:
 	#dfin.to_csv('dfin2.csv',sep='\t',index=None)
@@ -200,6 +223,7 @@ if len(sample_list) == 2:
 # SV or other type of variants
 dfsv = dfin[dfin['Alt'] == '<NON_REF>']
 dfin = dfin[dfin['Alt'] != '<NON_REF>']
+
 dfin['diff_len'] = dfin.apply(lambda row:diff_len(row['Ref'],row['Alt']),axis=1)
 
 for i in sample_list:
