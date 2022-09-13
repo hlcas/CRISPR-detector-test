@@ -104,12 +104,15 @@ if q30 < 75:
 	logger.info('Please check your sequencing quality.')
 	sys.exit(0)
 else:
-	# Dedup for treatment group BAM.
-	logger.info('Dedup for treatment group BAM.')
-	os.system('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz && sync')
-	os.system('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam && sync')
-	logger.info('Finished: Dedup for treatment group BAM.')
-	
+	if dedup == 1:
+		# Dedup for treatment group BAM.
+		logger.info('Dedup for treatment group BAM.')
+		os.system('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz && sync')
+		os.system('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam && sync')
+		logger.info('Finished: Dedup for treatment group BAM.')
+	else:
+		pass
+
 # Starting running minimap2 mapping reads to reference genome assembly (control group)
 if args.c1 != None:
 	logger.info('Mapping control group fastqs to reference genome assembly using minimap2.')
