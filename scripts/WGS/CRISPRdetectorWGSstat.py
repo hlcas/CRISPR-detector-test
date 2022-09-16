@@ -2,7 +2,7 @@
 '''
 #-------------------------------------------------
 #	   File Name: CRISPRdetectoWGSstat.py
-#	   Description: The script is designed to analyze deep-sequencing PCR products, aiming to compute CRISPR-triggered on/off-target efficiency.
+#	   Description: The script is designed to analyze whole genome sequencing data, aiming to compute CRISPR-triggered on/off-target efficiency.
 #	   Author: Lei Huang
 #	   Date: 2022.09.15
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -365,6 +365,7 @@ for i in sample_list:
 		WINDOW_INDEL = []
 		WINDOW_MUT0 = []
 		WINDOW_MUT1 = []
+		WINDOW_NON_REF = []
 		for t in range(w_start,w_end_1):
 			WINDOW_SUB = set(WINDOW_SUB) | set(POS_SUB[t])
 			WINDOW_DEL = set(WINDOW_DEL) | set(POS_DEL[t])
@@ -373,31 +374,40 @@ for i in sample_list:
 			WINDOW_MUT0 = set(WINDOW_MUT0) | set(POS_MUT[t])
 
 		if len(dfsvR) != 0:
-			dfsvR.to_csv(r+'/out_sv_'+i+'.txt',sep='\t',index=None)
+			dfsvR.to_csv(r+'/out_non_ref_'+i+'.txt',sep='\t',index=None)
 			for t in range(len(dfsvR)):
+				WINDOW_NON_REF = set(WINDOW_NON_REF) | set(dfsvR[i+'_ReadHash'].values[t].split('|'))
 				WINDOW_MUT1 = set(WINDOW_MUT0) | set(WINDOW_MUT1) | set(dfsvR[i+'_ReadHash'].values[t].split('|'))
+
 			try:
 				WINDOW_MUT1.remove('')
 			except:
 				pass
+
+			try:
+				WINDOW_NON_REF.remove('')
+			except:
+				pass
 		else:
 			WINDOW_MUT1 = WINDOW_MUT0
-
+			
 		regionMut[r]['S'] = len(WINDOW_SUB)
 		regionMut[r]['D'] = len(WINDOW_DEL)
 		regionMut[r]['I'] = len(WINDOW_INS)
 		regionMut[r]['INDEL'] = len(WINDOW_INDEL)
 		regionMut[r]['MUT0'] = len(WINDOW_MUT0)
 		regionMut[r]['MUT1'] = len(WINDOW_MUT1)
-		
+		regionMut[r]['NON_REF'] = len(WINDOW_NON_REF)	
+	
 	mapdf[i+'_Substitutions'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'S'))
 	mapdf[i+'_Deletions'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'D'))
 	mapdf[i+'_Insertions'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'I'))
 	mapdf[i+'_Indels'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'INDEL'))
-	mapdf[i+'_Modified_0'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'MUT0'))
-	mapdf[i+'_Modified_1'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'MUT1'))
+	mapdf[i+'_NON_REF'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'NON_REF'))
+	mapdf[i+'_Modified_without_NON_REF'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'MUT0'))
+	mapdf[i+'_Modified_with_NON_REF'] = mapdf['region'].apply(lambda x:extract_value(x,regionMut,'MUT1'))
 
-	for k in ['Substitutions','Deletions','Insertions','Indels','Modified_0','Modified_1']:
+	for k in ['Substitutions','Deletions','Insertions','Indels','Modified_without_NON_REF','Modified_with_NON_REF']:
 		mapdf[i+'_'+k+'%'] = mapdf[i+'_'+k]/mapdf['total_reads_'+i]
 		mapdf[i+'_'+k+'%'] = mapdf[i+'_'+k+'%'].apply(lambda x:round(x*100,2))
 
@@ -405,3 +415,4 @@ mapdf.to_csv('out_result_summary.txt',sep='\t',index=None)
 
 time1=time.time()
 logger.info('Finished! Running time: %s seconds'%(round(time1-time0,2))+'.')
+
