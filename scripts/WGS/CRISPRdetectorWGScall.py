@@ -21,12 +21,12 @@ from pyfaidx import Fasta
 
 description = '''
 ------------------------------------------------------------------------------------------------------------------------
-This script is designed to call variants for single amplicon & pooled amplicons sequencing data.
+This script is designed to call variants for whole genome sequencing data.
 Usage:
 python CRISPRdetectorWGScall.py  
---bed: BED format file path
---o: output path, default='.'
---threads: number of threads, default=15
+--o: output path [default='.']
+--bed: BED format file path [optional]
+--threads: number of threads [default=1]
 --assembly: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 ------------------------------------------------------------------------------------------------------------------------
