@@ -14,7 +14,6 @@ import time
 import logging
 import argparse
 import textwrap
-from Bio.Seq import Seq
 
 description = '''
 ------------------------------------------------------------------------------------------------------------------------
