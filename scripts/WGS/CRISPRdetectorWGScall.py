@@ -101,8 +101,8 @@ if bam_c != 0:
 else:
 	if bed != 'None':
 		# Call variants and calculate number of reads mapped with BED format file
-		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out)
-		os.system('sentieon driver -r '+fasta+' -i '+bam_t+ ' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' && sync')
+		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt')
+		os.system('sentieon driver -r '+fasta+' -i '+bam_t+ ' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt && sync')
 	else:
 		# Call variants without BED format file
 		logger.info('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out)
