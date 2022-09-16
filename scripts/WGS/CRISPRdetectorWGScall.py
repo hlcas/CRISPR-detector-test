@@ -24,8 +24,8 @@ description = '''
 This script is designed to call variants for single amplicon & pooled amplicons sequencing data.
 Usage:
 python CRISPRdetectorWGScall.py  
---o: output path
 --bed: BED format file path
+--o: output path, default='.'
 --threads: number of threads, default=15
 --assembly: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
