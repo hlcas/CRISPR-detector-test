@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorMAP.py
+#	   File Name: CRISPRdetectorAMPmap.py
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -19,31 +19,34 @@ import pandas as pd
 from Bio.Seq import Seq
 
 description = '''
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
 This script is designed to map single amplicon & pooled amplicons sequencing data to amplicons.
 Usage:
 python CRISPRdetectorMAP.py  
---sample: sample name & output directory name [required]
---e1: treatment group fq1 path [required]
---e2: treatment group fq2 path [optional]
+--o: output path [default:'.']
 --c1: control group fq2 path [optional]
 --c2: control group fq2 path [optional]
---o: output path [default:'.']
---threads: number of threads to run sentieon minimap2 & driver module [default:1] 
+--e1: treatment group fq1 path [required]
+--e2: treatment group fq2 path [optional]
+--sample: sample name & output directory name [required]
+--threads: number of threads to run sentieon minimap2 module [default:1] 
+--cleavage_offset: Center of quantification window to use within respect to the 3-end of the provided sgRNA sequence [dafault=-3]
+--window_size: Defines the size (in bp) of the quantification window extending from the position specified by the cleavage_offset parameter in relation to the 
+	       provided guide RNA sequence, 0 means whole amplicon analysis [default=0]
 --amplicons_file: a tab-delimited text amplicons description file with up to 3 columns: AMPLICON_NAME, AMPLICON_SEQ, gRNA_SEQ_without_PAM(optional) [required]  
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
 '''
 
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
+parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--e1", help="treated group fq1 path",required=True)
 parse.add_argument("--e2", help="treated group fq2 path",required=False)
 parse.add_argument("--c1", help="control group fq1 path",required=False)
 parse.add_argument("--c2", help="control group fq2 path",required=False)
 parse.add_argument("--sample",help="sample name & output dir",required=True)
+parse.add_argument("--threads",  help="number of threads [1]",default=1,type=int)
 parse.add_argument("--amplicons_file", help="Amplicons description file. This file is a tab-delimited text file with up to 5 columns (2 required)",required=True)
-parse.add_argument("--o",help='output path',default='.',required=False)
-parse.add_argument("--threads",  help="number of threads[15]",default=15,type=int)
-parse.add_argument("--cleavage_offset", help='Center of quantification window to use within respect to the 3-end of the provided sgRNA sequence[-3]',default=-3,type=int)
+parse.add_argument("--cleavage_offset", help='Center of quantification window to use within respect to the 3-end of the provided sgRNA sequence [-3]',default=-3,type=int)
 parse.add_argument("--window_size", help="Defines the size (in bp) of the quantification window extending from the position specified by the cleavage_offset parameter in relation to the provided guide RNA sequence[0], 0 means whole amplicon analysis",default=0,type=int)
  
 args = parse.parse_args()
@@ -147,16 +150,20 @@ with open('temp/amplicon_seq.fa','w') as f:
 		f.write('>'+amplicons_file['amplicon'].values[i]+'\n'+amplicons_file['amplicon_seq'].values[i]+'\n')
 
 fasta = 'temp/amplicon_seq.fa'
+logger.info('samtools faidx temp/amplicon_seq.fa')
 os.system('samtools faidx temp/amplicon_seq.fa && sync')
 
 logger.info('Mapping treatment group fastqs to amplicon(s) using minimap2.')
 if args.e2 != None:
+	logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i -')
 	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 else:
+	logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i -')
 	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 logger.info('Finished : mapping treatment group fastqs to amplicon(s) using minimap2.')
 
 # Q30 %
+logger.info('sentieon driver -i temp/'+sample+'.bam -r temp/amplicon_seq.fa --algo QualityYield temp/base_quality_metrics.txt')
 os.system('sentieon driver -i temp/'+sample+'.bam -r temp/amplicon_seq.fa --algo QualityYield temp/base_quality_metrics.txt && sync')
 qydf = pd.read_csv('temp/base_quality_metrics.txt',sep='\t',comment='#')
 q30 = round(qydf['Q30_BASES'].values[0]*100/qydf['TOTAL_BASES'].values[0],2)
@@ -171,8 +178,10 @@ if q30 < 75:
 if args.c1 != None:
 	logger.info('Mapping control group fastqs to amplicon(s) using minimap2.')
 	if args.c2 != None:
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	else:
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	logger.info('Finished : mapping control group fastqs to amplicon(s) using minimap2.')
 
