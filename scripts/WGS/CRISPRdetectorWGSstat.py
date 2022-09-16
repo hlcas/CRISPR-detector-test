@@ -381,10 +381,6 @@ for i in sample_list:
 
 			try:
 				WINDOW_MUT1.remove('')
-			except:
-				pass
-
-			try:
 				WINDOW_NON_REF.remove('')
 			except:
 				pass
