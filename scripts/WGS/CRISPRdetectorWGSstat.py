@@ -26,13 +26,19 @@ description = '''
 This script is designed to analyze single amplicon & pooled amplicons sequencing data.
 Usage:
 python CRISPRdetectorWGSstat.py  
+--o: output path, default='.'
+--bed: BED format file path [required]
+--assembly: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
+--min_num_of_reads: The minimum number of reads (per site) to evaluate, default=0
+--filt: To filt out background variants applying Chi-square test [1] or not [0],default=1
+--max_pv_active: The maximum pvalue of the statistical difference between treatment and control group sample, default=0.05
 ------------------------------------------------------------------------------------------------------------------------
 '''
 
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
 parse.add_argument("--o",help='output path',default='.',required=False)
-parse.add_argument("--bed", help="BED format file path",required=False)
+parse.add_argument("--bed", help="BED format file path",required=True)
 parse.add_argument("--sample",help="sample name & output dir",required=True)
 parse.add_argument("--assembly",help="genome path in fasta format",required=True)
 parse.add_argument("--min_num_of_reads",help="The minimum number of reads (per site) to evaluate",default=0,type=int)
@@ -55,7 +61,6 @@ fas = Fasta(fasta)
 sample = args.sample
 os.chdir(args.o)
 os.chdir(sample)
-
 
 # LOG file format
 logger = logging.getLogger()
