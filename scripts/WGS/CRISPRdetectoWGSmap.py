@@ -23,14 +23,15 @@ description = '''
 This script is designed to map whole genome sequencing data to genome reference FASTA format file.
 Usage:
 python CRISPRdetectorWGSmap.py  
---sample: sample name & output directory name [required]
---e1: treatment group fq1 path [required]
---e2: treatment group fq2 path [optional]
+--o: output path [default:'.']
 --c1: control group fq2 path [optional]
 --c2: control group fq2 path [optional]
---o: output path [default:'.']
---threads: number of threads to run sentieon minimap2 & driver module [default:1] 
---assembly: assembly path [required]
+--e1: treatment group fq1 path [required]
+--e2: treatment group fq2 path [optional]
+--assembly: reference genome assembly path [required]
+--sample: sample name & output directory name [required]
+--dedup: Dedup the BAM format file (1) or not (0) [default:1] 
+--threads: number of threads to run sentieon minimap2 module [default:1] 
 ------------------------------------------------------------------------------------------------------------------------
 '''
 
@@ -39,11 +40,11 @@ parse.add_argument("--e1", help="treated group fq1 path",required=True)
 parse.add_argument("--e2", help="treated group fq2 path",required=False)
 parse.add_argument("--c1", help="control group fq1 path",required=False)
 parse.add_argument("--c2", help="control group fq2 path",required=False)
-parse.add_argument("--sample",help="sample name & output dir",required=True)
-parse.add_argument("--assembly", help="assembly path",required=True)
 parse.add_argument("--o", help='output path',default='.',required=False)
+parse.add_argument("--sample",help="sample name & output dir",required=True)
 parse.add_argument("--threads", help="number of threads[15]",default=15,type=int)
-parse.add_argument("--dedup", help="Dedup the BAM format file[1] or not[0]",default=1,type=int)
+parse.add_argument("--assembly", help="reference genome assembly path",required=True)
+parse.add_argument("--dedup", help="Dedup the BAM format file (1) or not (0)",default=1,type=int)
 
 args = parse.parse_args()
 time0 =time.time()
