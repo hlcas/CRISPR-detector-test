@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorWGSstat.py
+#	   File Name: CRISPRdetectoWGSstat.py
 #	   Description: The script is designed to analyze deep-sequencing PCR products, aiming to compute CRISPR-triggered on/off-target efficiency.
 #	   Author: Lei Huang
-#	   Date: 2022.08.20
+#	   Date: 2022.09.15
 #	   E-mail: huanglei192@mails.ucas.ac.cn
 #-------------------------------------------------
 #'''
@@ -31,12 +31,13 @@ python CRISPRdetectorWGSstat.py
 '''
 
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
-parse.add_argument("--sample",help="sample name & output dir",required=True)
 parse.add_argument("--o",help='output path',default='.',required=False)
-parse.add_argument("--ignore_substitutions",help="Enable substitutions evaluation[1]",default=0,type=int)
-parse.add_argument("--min_num_of_reads",help="The minimum number of reads (per locus site) to evaluate",default=0,type=int)
-parse.add_argument("--bed",required=True)
-parse.add_argument("--assembly",required=True)
+parse.add_argument("--bed", help="BED format file path",required=False)
+parse.add_argument("--sample",help="sample name & output dir",required=True)
+parse.add_argument("--assembly",help="genome path in fasta format",required=True)
+parse.add_argument("--min_num_of_reads",help="The minimum number of reads (per site) to evaluate",default=0,type=int)
+parse.add_argument("--filt",help='To filt out background variants applying Chi-square test [1] or not [0]',default=1,required=False)
+parse.add_argument("--max_pv_active",help="The maximum pvalue of the statistical difference between treatment and control group sample",default=0.05,type=float,required=False)
 
 args = parse.parse_args()
 time0 =time.time()
@@ -168,12 +169,16 @@ with open('temp/split.vcf','w') as f:
 			if len(sample_list) == 2:
 				creadhash = vcf['control'].values[i].split(',')
 				for j in range(len(alt)):
-					if ('N' not in alt[j]) or (alt[j] == '<NON_REF>'):
+					if 'N' not in alt[j]:
 						f.write(chrx+'\t'+pos+'\t.\t'+ref+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\t0/1:'+creadhash[j]+'\n')
+					elif alt[j] == '<NON_REF>':
+						f.write(chrx+'\t'+pos+'\t.\t'+ref[0]+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\t0/1:'+creadhash[j]+'\n')
 			else:
 				for j in range(len(alt)):
-					if ('N' not in alt[j]) or (alt[j] == '<NON_REF>'):
+					if 'N' not in alt[j]:# or (alt[j] == '<NON_REF>'):
 						f.write(chrx+'\t'+pos+'\t.\t'+ref+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\n')
+					elif alt[j] == '<NON_REF>':
+						f.write(chrx+'\t'+pos+'\t.\t'+ref[0]+'\t'+alt[j]+'\t.\t.\t.\tGT:ReadHash\t0/1:'+treadhash[j]+'\n')
 
 vcf = pd.read_csv('temp/split.vcf',sep='\t',header=None,comment='#')
 
@@ -182,6 +187,7 @@ if len(sample_list) == 2:
 else:
 	vcf.columns = ['#CHROM','POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','treatment']
 
+#vcf.to_csv('temp/anno.vcf',sep='\t',index=None)
 os.system('convert2annovar.pl -format vcf4 temp/split.vcf > temp/anno.avinput && sync')
 
 dfin = pd.read_csv('temp/anno.avinput',sep='\t',header=None)
@@ -213,12 +219,13 @@ vcflencheck(dfin,'No variants on BED file defined regions.')
 dfin = pd.merge(dfin,mapdf,on='region',how='left')
 dfin.to_csv('tmp.csv',sep='\t',index=None)
 
-if len(sample_list) == 2:
-	#dfin.to_csv('dfin2.csv',sep='\t',index=None)
-	dfin['pvalue'] = dfin.apply(lambda row:chi_test(row['treatment_ReadHash'],row['control_ReadHash'],row['total_reads_treatment'],row['total_reads_control']),axis=1)
-	dfin.to_csv('temp/out_mutations.txt',index=None,sep='\t')
-	dfin = dfin[dfin['pvalue'] < 0.05]
-	dfin.to_csv('temp/out_mutations_pvalue_Filt.txt',index=None,sep='\t')
+if args.filt == 1:
+	
+	if len(sample_list) == 2:
+		dfin['pvalue'] = dfin.apply(lambda row:chi_test(row['treatment_ReadHash'],row['control_ReadHash'],row['total_reads_treatment'],row['total_reads_control']),axis=1)
+		dfin.to_csv('temp/out_mutations.txt',index=None,sep='\t')
+		dfin = dfin[dfin['pvalue'] < args.max_pv_active]
+		dfin.to_csv('temp/out_mutations_pvalue_Filt.txt',index=None,sep='\t')
 
 # SV or other type of variants
 dfsv = dfin[dfin['Alt'] == '<NON_REF>']
