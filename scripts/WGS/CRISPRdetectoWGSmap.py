@@ -89,12 +89,15 @@ threads = str(args.threads)
 
 logger.info('Mapping treatment group fastqs to reference genome assembly sing minimap2.')
 if args.e2 != None:
+	logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i -')
 	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' '+e2+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 else:
+	logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i -')
 	os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:'+sample+'\\tSM:'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+e1+' | sentieon util sort -o temp/'+sample+'.bam -t '+threads+' --sam2bam -i - && sync')
 logger.info('Finished : mapping treatment group fastqs to reference genome assembly using minimap2.')
 
 # Q30 %
+logger.info('sentieon driver -i temp/'+sample+'.bam -r '+fasta+' --algo QualityYield temp/base_quality_metrics.txt')
 os.system('sentieon driver -i temp/'+sample+'.bam -r '+fasta+' --algo QualityYield temp/base_quality_metrics.txt && sync')
 qydf = pd.read_csv('temp/base_quality_metrics.txt',sep='\t',comment='#')
 q30 = round(qydf['Q30_BASES'].values[0]*100/qydf['TOTAL_BASES'].values[0],2)
@@ -108,7 +111,9 @@ else:
 	if dedup == 1:
 		# Dedup for treatment group BAM.
 		logger.info('Dedup for treatment group BAM.')
+		logger.info('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz')
 		os.system('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz && sync')
+		logger.info('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam')
 		os.system('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam && sync')
 		logger.info('Finished: Dedup for treatment group BAM.')
 	else:
@@ -118,14 +123,18 @@ else:
 if args.c1 != None:
 	logger.info('Mapping control group fastqs to reference genome assembly using minimap2.')
 	if args.c2 != None:
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	else:
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
 		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	logger.info('Finished: mapping control group fastqs to reference genome assembly using minimap2.')
 	if dedup == 1:
 		# Dedup for control group BAM.
 		logger.info('Dedup for control group BAM.')
+		logger.info('sentieon driver -i temp/'+sample+'.control.bam --algo LocusCollector --fun score_info temp/control.score.txt.gz')
 		os.system('sentieon driver -i temp/'+sample+'.control.bam --algo LocusCollector --fun score_info temp/control.score.txt.gz && sync')
+		logger.info('sentieon driver -i temp/'+sample+'.control.bam --algo Dedup --rmdup --score_info temp/control.score.txt.gz temp/'+sample+'.control.deduped.bam')
 		os.system('sentieon driver -i temp/'+sample+'.control.bam --algo Dedup --rmdup --score_info temp/control.score.txt.gz temp/'+sample+'.control.deduped.bam && sync')
 		logger.info('Finished: Dedup for control group BAM.')
 
