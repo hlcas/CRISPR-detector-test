@@ -14,10 +14,6 @@ import time
 import logging
 import argparse
 import textwrap
-import numpy as np
-import pandas as pd
-from Bio.Seq import Seq
-from pyfaidx import Fasta
 
 description = '''
 ------------------------------------------------------------------------------------------------------------------------
