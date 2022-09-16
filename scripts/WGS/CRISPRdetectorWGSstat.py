@@ -17,7 +17,6 @@ import argparse
 import textwrap
 import numpy as np
 import pandas as pd
-from Bio.Seq import Seq
 from scipy import stats
 from pyfaidx import Fasta
 
