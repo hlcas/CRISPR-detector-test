@@ -20,18 +20,18 @@ from Bio.Seq import Seq
 from pyfaidx import Fasta
 
 description = '''
-------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
 This script is designed to call variants for single amplicon & pooled amplicons sequencing data.
 Usage:
 python CRISPRdetectorCALL.py  
---sample: sample name & output directory name [required]
 --o: output path [default:'.']
-------------------------------------------------------------------------------------------------------------------------
+--sample: sample name & output directory name [required] 
+------------------------------------------------------------------------------------------------
 '''
+
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
 parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--sample",help='sample name & output dir',required=True)
-parse.add_argument("--threads",  help="number of threads[15]",default=15,type=int)
 
 args = parse.parse_args()
 time0 =time.time()
@@ -49,8 +49,6 @@ fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
 logger.addHandler(fh)
-
-threads = str(args.threads)
 
 # Starting calling variants
 logger.info('Calling variants.')
@@ -73,7 +71,6 @@ else:
 
 logger.info('bcftools norm -m- temp/raw.vcf.gz > temp/split.vcf')
 os.system('bcftools norm -m- temp/raw.vcf.gz > temp/split.vcf && sync')
-
 
 logger.info('Finished: variants called.')
 
