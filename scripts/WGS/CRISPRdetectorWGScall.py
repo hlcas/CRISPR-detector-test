@@ -89,8 +89,8 @@ if bam_c != 0:
 		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+ ' -i '+bam_c+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out)
 		os.system('sentieon driver -r '+fasta+' -i '+bam_t+ ' -i '+bam_c+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' && sync')
 		# Number of reads
-		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt')
-		os.system('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt && sync')
+		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt')
+		os.system('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt && sync')
 		logger.info('sentieon driver -r '+fasta+' -i '+bam_c+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_control.txt')
 		os.system('sentieon driver -r '+fasta+' -i '+bam_c+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_control.txt && sync')
 	else:
@@ -101,8 +101,8 @@ if bam_c != 0:
 else:
 	if bed != 'None':
 		# Call variants and calculate number of reads mapped with BED format file
-		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt')
-		os.system('sentieon driver -r '+fasta+' -i '+bam_t+ ' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatmentxt && sync')
+		logger.info('sentieon driver -r '+fasta+' -i '+bam_t+' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt')
+		os.system('sentieon driver -r '+fasta+' -i '+bam_t+ ' -t '+threads+' --interval '+bed+' --interval_padding 300 --algo EditCounterByAllele '+vcf_out+' --algo EditCounterByTarget --target_list '+bed+' temp/tmp_reads_treatment.txt && sync')
 	else:
 		# Call variants without BED format file
 		logger.info('sentieon driver -i '+bam_t+' -r '+fasta+' --algo EditCounterByAllele '+vcf_out)
