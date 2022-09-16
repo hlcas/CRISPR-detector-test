@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorWGScall.py
+#	   File Name: CRISPRdetectorAMPcall.py
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -23,7 +23,7 @@ description = '''
 ------------------------------------------------------------------------------------------------
 This script is designed to call variants for single amplicon & pooled amplicons sequencing data.
 Usage:
-python CRISPRdetectorCALL.py  
+python CRISPRdetectorAMPcall.py  
 --o: output path [default:'.']
 --sample: sample name & output directory name [required] 
 ------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ os.chdir(sample)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 rq = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
-fh = logging.FileHandler('CRISPRdetectorCALL.log', mode='w')
+fh = logging.FileHandler('RUNNING_calling.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
@@ -68,9 +68,6 @@ if bam_c != 0:
 else:
 	logger.info('sentieon driver -i '+bam_t+' -r temp/amplicon_seq.fa --algo EditCounterByAllele temp/raw.vcf.gz --algo EditCounterByTarget --target_list temp/window.bed temp/tmp_reads_treatmentxt')
 	os.system('sentieon driver -i '+bam_t+' -r temp/amplicon_seq.fa --algo EditCounterByAllele temp/raw.vcf.gz --algo EditCounterByTarget --target_list temp/window.bed temp/tmp_reads_treatmentxt && sync')
-
-logger.info('bcftools norm -m- temp/raw.vcf.gz > temp/split.vcf')
-os.system('bcftools norm -m- temp/raw.vcf.gz > temp/split.vcf && sync')
 
 logger.info('Finished: variants called.')
 
