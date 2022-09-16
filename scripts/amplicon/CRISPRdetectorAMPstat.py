@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#          Filename: CRISPRdetectorWGSstat.py
+#          Filename: CRISPRdetectorAMPstat.py
 #	   Description: The script is designed to analyze deep-sequencing PCR products, aiming to compute CRISPR-triggered on/off-target efficiency.
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
@@ -25,9 +25,11 @@ description = '''
 ------------------------------------------------------------------------------------------------------------------------
 This script is designed to analyze single amplicon & pooled amplicons sequencing data.
 Usage:
-python CRISPRdetectorWGSstat.py  
---sample: sample name & output directory name [required]
+python CRISPRdetectorAMPstat.py  
 --o: output path [default='.']
+--sample: sample name & output directory name [required]
+
+--min_num_of_reads : The minimum number of reads (per locus site) to evaluate [default=100]
 --filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
 --max_pv_active: The maximum pvalue of the statistical difference between treatment and control group sample [default=0.05]
 ------------------------------------------------------------------------------------------------------------------------
