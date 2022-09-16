@@ -103,7 +103,7 @@ def diff_len(x,y):
 		else:
 			return len(y) - len(x)
 
-# Check if the length of the VCF
+# Check the length of the VCF
 def vcflencheck(dfx,strx):
 	if len(dfx) == 0:
 		logger.info(strx)
