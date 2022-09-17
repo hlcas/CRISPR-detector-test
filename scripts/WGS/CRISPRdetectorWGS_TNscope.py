@@ -72,8 +72,8 @@ if os.path.exists('temp/'+sample+'.deduped.bam'):
 elif os.path.exists('temp/'+sample+'.bam'):
 	bam_t = 'temp/'+sample+'.bam'
 else:
-	logger.info('BAM format file not found.')
-	sys.exit(0)
+	logger.error('BAM format file not found.')
+	sys.exit('ERROR: BAM format file not found in '+sample+'/temp/')
 if os.path.exists('temp/'+sample+'.control.deduped.bam'):
 	bam_c = 'temp/'+sample+'.control.deduped.bam'
 elif os.path.exists('temp/'+sample+'.control.bam'):
@@ -93,8 +93,8 @@ if bam_c != 0:
 		os.system('sentieon driver -r '+fa+' -t '+t+' -i '+bam_t+' -i '+bam_c+' --interval '+bed+' --algo TNscope --tumor_sample '+sample+' --normal_sample control_'+sample+params+vcf+' && sync')
 	else:
 		# Call variants without BED format file
-		logger.info('sentieon driver -r '+fa+' -t '+t+' -i '+bam_t+' -i '+bam_c+' '+bed+' --algo TNscope --tumor_sample '+sample+' --normal_sample control_'+sample+params+vcf)
-		os.system('sentieon driver -r '+fa+' -t '+t+' -i '+bam_t+' -i '+bam_c+' '+bed+' --algo TNscope --tumor_sample '+sample+' --normal_sample control_'+sample+params+vcf+' && sync')
+		logger.info('sentieon driver -r '+fa+' -t '+t+' -i '+bam_t+' -i '+bam_c+' --algo TNscope --tumor_sample '+sample+' --normal_sample control_'+sample+params+vcf)
+		os.system('sentieon driver -r '+fa+' -t '+t+' -i '+bam_t+' -i '+bam_c+' --algo TNscope --tumor_sample '+sample+' --normal_sample control_'+sample+params+vcf+' && sync')
 # Single sample
 else:
 	params = ' --min_tumor_allele_frac '+min_frac+' --filter_t_alt_frac '+min_frac+' --resample_depth 100000 --assemble_mode 3 '
