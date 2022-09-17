@@ -152,28 +152,28 @@ del dfin_0['Site']
 
 vcflencheck(dfin,'No variants on BED file defined regions.')
 
-df_bed = pd.read_csv(bed,sep='\t',header=None)
-df_bed.columns = ['Site','ampChr','ampStart','ampEnd']
+df_coordinate = pd.read_csv(coordinate_tab,sep='\t',header=None)
+df_coordinate.columns = ['Site','ampChr','ampStart','ampEnd']
 
 dic_coor = {}
-for i in range(len(df_bed)):
-	ampStart = df_bed['ampStart'].values[i]
-	ampEnd = df_bed['ampEnd'].values[i]
-	ampChr = df_bed['ampChr'].values[i]
+for i in range(len(df_coordinate)):
+	ampStart = df_coordinate['ampStart'].values[i]
+	ampEnd = df_coordinate['ampEnd'].values[i]
+	ampChr = df_coordinate['ampChr'].values[i]
 
-	ampID = df_bed['Site'].values[i]
+	ampID = df_coordinate['Site'].values[i]
 
 	if ampStart >= ampEnd:
-		logger.error(bed+': format error, '+ampID+':'+str(ampStart)+' >= '+str(ampEnd))
-		sys.exit(bed+': format error, '+ampID+':'+str(ampStart)+' >= '+str(ampEnd))
+		logger.error(coordinate_tab+': format error, '+ampID+': '+str(ampStart)+' >= '+str(ampEnd))
+		sys.exit(coordinate_tab+': format error, '+ampID+': '+str(ampStart)+' >= '+str(ampEnd))
 	else:
 		hg38_seq = str(fa[ampChr][ampStart:ampEnd].seq)
 		ampSeq = str(amp_fa[ampID][:].seq)
 		if hg38_seq != ampSeq:
 			reverse_seq = Seq(hg38_seq).reverse_complement()
 			if reverse_seq != ampSeq:
-				logger.error(bed+': format error, '+ampID+'\namplicon sequence:'+ampSeq+'\nBED format file corresponding sequence:'+reverse_seq)
-				sys.exit(bed+': format error, '+ampID+'\namplicon sequence:'+ampSeq+'\nBED format file corresponding sequence:'+reverse_seq)
+				logger.error(coordinate_tab+': format error, '+ampID+'\namplicon sequence: '+ampSeq+'\nBED format file corresponding sequence: '+reverse_seq)
+				sys.exit(coordinate_tab+': format error, '+ampID+'\namplicon sequence: '+ampSeq+'\nBED format file corresponding sequence: '+reverse_seq)
 			else:
 				dic_coor[ampID] = [ampChr,ampStart,ampEnd,'-']
 		else:
