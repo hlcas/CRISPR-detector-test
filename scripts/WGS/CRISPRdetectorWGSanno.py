@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#	   File Name: CRISPRdetectorWGScall.py
+#	   File Name: CRISPRdetectorWGSanno.py
 #	   Author: Lei Huang
 #	   Date: 2022.08.20
 #	   E-mail: huanglei192@mails.ucas.ac.cn
@@ -19,7 +19,7 @@ import pandas as pd
 
 description = '''
 --------------------------------------------------------------------------------------------------------------------------
-This script is designed to call variants for whole genome sequencing data.
+This script is designed to anno variants called by TNscope.
 Usage:
 python CRISPRdetectorWGS_TNscope.py  
 --o: output path [default='.']
@@ -52,7 +52,7 @@ os.chdir(sample)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 rq = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
-fh = logging.FileHandler('RUNNING_TNscope.log', mode='w')
+fh = logging.FileHandler('RUNNING_annotation.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
 fh.setFormatter(formatter)
