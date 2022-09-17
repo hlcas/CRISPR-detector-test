@@ -21,7 +21,7 @@ description = '''
 --------------------------------------------------------------------------------------------------------------------------
 This script is designed to anno variants called by TNscope.
 Usage:
-python CRISPRdetectorWGS_TNscope.py  
+python CRISPRdetectorWGSanno.py  
 --o: output path [default='.']
 --bed: BED format file path [required]
 --db: ANNOVAR database path [required]
