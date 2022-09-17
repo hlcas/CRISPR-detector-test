@@ -23,7 +23,7 @@ python CRISPRdetectorWGS_TNscope.py
 --o: output path [default='.']
 --bed: BED format file path [optional]
 --threads: number of threads [default=1]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 --min_tumor_allele_frac: The minimum allelic fraction in treated sample [default=0.005]
 --max_fisher_pv_active: The maximum pvalue of the statistical difference between treated and untreated sample [default=0.05]
@@ -33,8 +33,8 @@ python CRISPRdetectorWGS_TNscope.py
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
 parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--sample",help='sample name & output dir',required=True)
+parse.add_argument("--fasta",help='reference genome assembly path',required=True)
 parse.add_argument("--threads",  help="number of threads [15]",default=15,type=int)
-parse.add_argument("--assembly",help='reference genome assembly path',required=True)
 parse.add_argument("--bed",help='BED format file path',default='None',required=False)
 parse.add_argument("--min_tumor_allele_frac", help="The minimum allelic fraction in treated sample",default=0.005,type=float)
 parse.add_argument("--max_fisher_pv_active",help="The maximum pvalue of the statistical difference between treated and untreated sample",default=0.05,type=float)
@@ -42,7 +42,7 @@ parse.add_argument("--max_fisher_pv_active",help="The maximum pvalue of the stat
 args = parse.parse_args()
 time0 =time.time()
 
-fa = os.path.abspath(args.assembly)
+fa = os.path.abspath(args.fasta)
 
 bed = args.bed
 if bed != 'None':
