@@ -25,22 +25,23 @@ This script is designed to anno variants called by TNscope.
 Usage:
 python CRISPRdetectorAMPanno.py  
 --o: output path [default='.']
---bed: BED format file path [required]
 --db: ANNOVAR database path [required]
+--fasta: assembly fasta path [required]
 --assembly: assembly version, hg19,hg38 ... [required]
 --sample: sample name & output directory name [required]
+--coordinate_tab: coordinate table for amplicons [required]
 --min_num_of_reads: The minimum number of reads (per site) to evaluate [default=100] 
 --ClinVar: only organism homo sapiens experiment type sequencing data support variant annotations from ClinVar [default=0]  
 --------------------------------------------------------------------------------------------------------------------------
 '''
 
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
-parse.add_argument("--coordinate_tab",help='coordinate table for amplicons',required=True)
+parse.add_argument("--fasta",help="assembly fasta path",required=True)
 parse.add_argument("--db", help="Annovar database path",required=True)
 parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--sample",help='sample name & output dir',required=True)
 parse.add_argument("--assembly", help="assembly version, hg38/hg19/mm9...",required=True)
-parse.add_argument("--fasta",help="assembly fasta",required=True)
+parse.add_argument("--coordinate_tab",help='coordinate table for amplicons',required=True)
 parse.add_argument("--min_num_of_reads",help="The minimum number of reads (per site) to evaluate",default=100,type=int)
 parse.add_argument("--ClinVar", help="Organism Homo sapiens experiment type sequencing data support variant annotations from ClinVar[1]",default=0,type=int)
 
