@@ -25,7 +25,7 @@ python CRISPRdetectorWGSmap.py
 --c2: control group fq2 path [optional]
 --e1: treatment group fq1 path [required]
 --e2: treatment group fq2 path [optional]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 --dedup: Dedup the BAM format file (1) or not (0) [default:1] 
 --threads: number of threads to run sentieon minimap2 module [default:1] 
@@ -40,14 +40,14 @@ parse.add_argument("--c2", help="control group fq2 path",required=False)
 parse.add_argument("--o", help='output path',default='.',required=False)
 parse.add_argument("--sample",help="sample name & output dir",required=True)
 parse.add_argument("--threads", help="number of threads[15]",default=15,type=int)
-parse.add_argument("--assembly", help="reference genome assembly path",required=True)
+parse.add_argument("--fasta", help="reference genome assembly path",required=True)
 parse.add_argument("--dedup", help="Dedup the BAM format file (1) or not (0)",default=1,type=int)
 
 args = parse.parse_args()
 time0 =time.time()
 
 e1 = os.path.abspath(args.e1)
-fasta = os.path.abspath(args.assembly)
+fasta = os.path.abspath(args.fasta)
 dedup = args.dedup
 
 # Check to path of input Fastqs
