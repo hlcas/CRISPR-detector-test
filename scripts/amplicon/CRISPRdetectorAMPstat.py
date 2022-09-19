@@ -257,27 +257,28 @@ for i in sample_list:
 			startPOS = dfinJ['Start'].values[n]
 			#print(str(j)+':'+str(len(dfinJ))+':'+str(n))
 			ReadHashs = dfinJ[i+'_ReadHash'].values[n].split('|')
-			# Deletions
-			if dlen < 0:
-				endPOS_1 = dfinJ['End'].values[n] + 1
-				for m in range(startPOS,endPOS_1):
-					POS_DEL[m] = set(POS_DEL[m]) | set(ReadHashs)
-			# Insertions
-			elif dlen > 0:
-				POS_INS[startPOS] = set(POS_INS[startPOS]) | set(ReadHashs)
+			if ReadHashs != ['']:
+				# Deletions
+				if dlen < 0:
+					endPOS_1 = dfinJ['End'].values[n] + 1
+					for m in range(startPOS,endPOS_1):
+						POS_DEL[m] = set(POS_DEL[m]) | set(ReadHashs)
+				# Insertions
+				elif dlen > 0:
+					POS_INS[startPOS] = set(POS_INS[startPOS]) | set(ReadHashs)
 
-			# Substitutions
-			else:
-				refN = dfinJ['Ref'].values[n]
-				altN = dfinJ['Alt'].values[n]
-				if altN == 'A':
-					POS_A[startPOS] = set(POS_A[startPOS]) | set(ReadHashs)	
-				elif altN == 'G': 
-					POS_G[startPOS] = set(POS_G[startPOS]) | set(ReadHashs) 
-				elif altN == 'C':
-					POS_C[startPOS] = set(POS_C[startPOS]) | set(ReadHashs)
-				elif altN == 'T':
-					POS_T[startPOS] = set(POS_T[startPOS]) | set(ReadHashs)
+				# Substitutions
+				else:
+					refN = dfinJ['Ref'].values[n]
+					altN = dfinJ['Alt'].values[n]
+					if altN == 'A':
+						POS_A[startPOS] = set(POS_A[startPOS]) | set(ReadHashs)	
+					elif altN == 'G': 
+						POS_G[startPOS] = set(POS_G[startPOS]) | set(ReadHashs) 
+					elif altN == 'C':
+						POS_C[startPOS] = set(POS_C[startPOS]) | set(ReadHashs)
+					elif altN == 'T':
+						POS_T[startPOS] = set(POS_T[startPOS]) | set(ReadHashs)
 				
 		for t in range(1,amplen_1):
 			POS_SUB[t] = set(POS_A[t]) | set(POS_G[t]) | set(POS_C[t]) | set(POS_T[t])
@@ -340,8 +341,9 @@ for i in sample_list:
 				sv_start = dfsvJ['Start'].values[t]
 				sv_end_1 = dfsvJ['End'].values[t] + 1
 				if len(set(range(window_start,window_end_1)).intersection(set(range(sv_start,sv_end_1)))) != 0:
-					WINDOW_MUT1 = set(WINDOW_MUT1) | set(WINDOW_MUT0) | set(dfsvJ[i+'_ReadHash'].values[t].split('|'))
-					WINDOW_NON_REF = set(WINDOW_NON_REF) | set(dfsvJ[i+'_ReadHash'].values[t].split('|'))
+					svReadHashs = dfsvJ[i+'_ReadHash'].values[t].split('|')
+					WINDOW_MUT1 = set(WINDOW_MUT1) | set(WINDOW_MUT0) | set(svReadHashs)
+					WINDOW_NON_REF = set(WINDOW_NON_REF) | set(svReadHashs)
 			try:
 				WINDOW_MUT1.remove('')
 				WINDOW_NON_REF.remove('')
