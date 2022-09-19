@@ -74,7 +74,7 @@ python scripts/amplicon/CRISPRdetectorAMPcall.py
 --sample: sample name & output directory name [required] 
 ```
 
-### 1.3 Analysis editing outcomes
+### 1.3 Analyzing editing outcomes
 ```
 python scripts/amplicon/CRISPRdetectorAMPstat.py  
 --o: output path [default='.']
@@ -133,7 +133,7 @@ python scripts/WGS/CRISPRdetectorWGScall.py
 --sample: sample name & output directory name [required]
 ```
 
-### 2.3 Analysis editing outcomes
+### 2.3 Analyzing editing outcomes
 ```
 python scripts/WGS/CRISPRdetectorWGSstat.py  
 --o: output path [default='.']
