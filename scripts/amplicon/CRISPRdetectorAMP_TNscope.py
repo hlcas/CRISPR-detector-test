@@ -19,7 +19,7 @@ description = '''
 ----------------------------------------------------------------------------------------------------------------------------
 This script is designed to call variants using TNscope.
 Usage:
-python CRISPRdetectorWGS_TNscope.py  
+python CRISPRdetectorAMP_TNscope.py  
 --o: output path [default='.']
 --threads: number of threads [default=1]
 --sample: sample name & output directory name [required]
