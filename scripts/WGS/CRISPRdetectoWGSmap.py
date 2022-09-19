@@ -110,8 +110,8 @@ else:
 		logger.info('Dedup for treatment group BAM.')
 		logger.info('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz')
 		os.system('sentieon driver -i temp/'+sample+'.bam --algo LocusCollector --fun score_info temp/treatment.score.txt.gz && sync')
-		logger.info('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam')
-		os.system('sentieon driver -i temp/'+sample+'.bam --algo  Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam && sync')
+		logger.info('sentieon driver -i temp/'+sample+'.bam --algo Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam')
+		os.system('sentieon driver -i temp/'+sample+'.bam --algo Dedup --rmdup --score_info temp/treatment.score.txt.gz temp/'+sample+'.deduped.bam && sync')
 		logger.info('Finished: Dedup for treatment group BAM.')
 	else:
 		pass
@@ -120,11 +120,11 @@ else:
 if args.c1 != None:
 	logger.info('Mapping control group fastqs to reference genome assembly using minimap2.')
 	if args.c2 != None:
-		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
-		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
+		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' '+c2+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	else:
-		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
-		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R  \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
+		logger.info('sentieon minimap2 -ax sr -Y -K 100000000 -R \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i -')
+		os.system('sentieon minimap2 -ax sr -Y -K 100000000 -R \"@RG\\tID:control_'+sample+'\\tSM:control_'+sample+'\\tPL:$platform\" -t '+threads+' '+fasta+' '+c1+' | sentieon util sort -o temp/'+sample+'.control.bam -t '+threads+' --sam2bam -i - && sync')
 	logger.info('Finished: mapping control group fastqs to reference genome assembly using minimap2.')
 	if dedup == 1:
 		# Dedup for control group BAM.
