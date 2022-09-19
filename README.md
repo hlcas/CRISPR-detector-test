@@ -97,7 +97,7 @@ python scripts/amplicon/CRISPRdetectorAMP_TNscope.py
 --max_fisher_pv_active: The maximum pvalue of the statistical difference between treated and untreated sample [default=0.05]
 ```
 
-### 1.5 annotations of variants called by TNscope using ANNOVAR
+### 1.5 Annotations of variants called by TNscope using ANNOVAR
 ```
 python scripts/amplicon/CRISPRdetectorAMPanno.py  
 --o: output path [default='.']
@@ -111,7 +111,7 @@ python scripts/amplicon/CRISPRdetectorAMPanno.py
 ```
 
 ## 2. Whole genome sequencing data analysis
-### 1.1 Mapping reads to reference genome
+### 2.1 Mapping reads to reference genome
 ```
 python scripts/WGS/CRISPRdetectorWGSmap.py  
 --o: output path [default:'.']
@@ -125,7 +125,7 @@ python scripts/WGS/CRISPRdetectorWGSmap.py
 --threads: number of threads to run sentieon minimap2 module [default:1] 
 ```
 
-### 1.2 Calling variants
+### 2.2 Calling variants
 ```
 python scripts/WGS/CRISPRdetectorWGScall.py
 --o: output path [default='.']
@@ -135,7 +135,7 @@ python scripts/WGS/CRISPRdetectorWGScall.py
 --sample: sample name & output directory name [required]
 ```
 
-### 1.3 Analysis editing outcomes
+### 2.3 Analysis editing outcomes
 ```
 python scripts/WGS/CRISPRdetectorWGSstat.py  
 --o: output path [default='.']
@@ -148,7 +148,7 @@ python scripts/WGS/CRISPRdetectorWGSstat.py
 ```
 
 ## [Optional] Running TNscope to call out reliable variants
-### 1.4 Calling variants using TNscope
+### 2.4 Calling variants using TNscope
 ```
 python scripts/WGS/CRISPRdetectorWGS_TNscope.py  
 --o: output path [default='.']
@@ -160,7 +160,7 @@ python scripts/WGS/CRISPRdetectorWGS_TNscope.py
 --max_fisher_pv_active: The maximum pvalue of the statistical difference between treated and untreated sample [default=0.05]
 ```
 
-### 1.5 annotations of variants called by TNscope using ANNOVAR
+### 2.5 Annotations of variants called by TNscope using ANNOVAR
 ```
 python scripts/WGS/CRISPRdetectorWGSanno.py  
 --o: output path [default='.']
