@@ -22,7 +22,7 @@ description = '''
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 This script is designed to map single amplicon & pooled amplicons sequencing data to amplicons.
 Usage:
-python CRISPRdetectorMAP.py  
+python CRISPRdetectorAMPmap.py  
 --o: output path [default:'.']
 --c1: control group fq2 path [optional]
 --c2: control group fq2 path [optional]
