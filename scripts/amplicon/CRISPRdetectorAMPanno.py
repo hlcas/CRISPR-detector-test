@@ -196,7 +196,7 @@ with open('temp/lift.annovar.tab','w') as f:
 		if dStrand == '-':
 			f.write(dChr+'\t'+str(dEnd-vEnd+1)+'\t'+str(dEnd-vStart+1)+'\t'+str(Seq(vRef).reverse_complement())+'\t'+str(Seq(vAlt).reverse_complement())+'\thet\t.\t'+str(vDP)+'\n')
 		else:
-			f.write(dChr+'\t'+str(dStart+vStart-1)+'\t'+str(dStart+vEnd-1)+'\t'+vRef+'\t'+vAlt+'\thet\t.\t'+str(vDP)+'\n')
+			f.write(dChr+'\t'+str(dStart+vStart)+'\t'+str(dStart+vEnd)+'\t'+vRef+'\t'+vAlt+'\thet\t.\t'+str(vDP)+'\n')
 			
 if args.ClinVar ==1:
 	logger.info('Starting annotate variants using ANNOVAR with ClinVar and refGene database.')
