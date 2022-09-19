@@ -1,6 +1,6 @@
 ## System requirements
 ### Sentieon module
-Download Sentieon toolkit 
+Download Sentieon   toolkit 
 curl -o sentieon-genomics-202112.05+crispr4.tar.gz ftp://ftp.sentieon.com/download/sentieon-genomics-202112.05+crispr4.tar.gz  
 You may request a license by sending emails to frank.hu@sentieon.com
 ```
