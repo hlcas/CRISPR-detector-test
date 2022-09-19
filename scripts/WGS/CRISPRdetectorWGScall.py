@@ -23,21 +23,21 @@ python CRISPRdetectorWGScall.py
 --o: output path [default='.']
 --bed: BED format file path [optional]
 --threads: number of threads [default=1]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 ------------------------------------------------------------------------------------------------------------------------
 '''
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
 parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--sample",help='sample name & output dir',required=True)
+parse.add_argument("--fasta",help='reference genome assembly path',required=True)
 parse.add_argument("--threads",  help="number of threads [15]",default=15,type=int)
-parse.add_argument("--assembly",help='reference genome assembly path',required=True)
 parse.add_argument("--bed",help='BED format file path',default='None',required=False)
 
 args = parse.parse_args()
 time0 =time.time()
 
-fasta = os.path.abspath(args.assembly)
+fasta = os.path.abspath(args.fasta)
 
 bed = args.bed
 if bed != 'None':
