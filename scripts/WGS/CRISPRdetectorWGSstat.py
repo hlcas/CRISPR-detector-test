@@ -375,8 +375,9 @@ for i in sample_list:
 		if len(dfsvR) != 0:
 			dfsvR.to_csv(r+'/out_non_ref_'+i+'.txt',sep='\t',index=None)
 			for t in range(len(dfsvR)):
-				WINDOW_NON_REF = set(WINDOW_NON_REF) | set(dfsvR[i+'_ReadHash'].values[t].split('|'))
-				WINDOW_MUT1 = set(WINDOW_MUT0) | set(WINDOW_MUT1) | set(dfsvR[i+'_ReadHash'].values[t].split('|'))
+				svReadHashs = dfsvR[i+'_ReadHash'].values[t].split('|')
+				WINDOW_NON_REF = set(WINDOW_NON_REF) | set(svReadHashs)
+				WINDOW_MUT1 = set(WINDOW_MUT0) | set(WINDOW_MUT1) | set(svReadHashs)
 
 			try:
 				WINDOW_MUT1.remove('')
