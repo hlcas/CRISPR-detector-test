@@ -28,7 +28,6 @@ Usage:
 python CRISPRdetectorAMPstat.py  
 --o: output path [default='.']
 --sample: sample name & output directory name [required]
-
 --min_num_of_reads : The minimum number of reads (per locus site) to evaluate [default=100]
 --filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
 --max_pv_active: The maximum pvalue of the statistical difference between treatment and control group sample [default=0.05]
