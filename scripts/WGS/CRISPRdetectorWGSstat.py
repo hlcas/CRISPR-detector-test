@@ -224,7 +224,6 @@ dfin = pd.merge(dfin,mapdf,on='region',how='left')
 dfin.to_csv('tmp.csv',sep='\t',index=None)
 
 if args.filt == 1:
-	
 	if len(sample_list) == 2:
 		dfin['pvalue'] = dfin.apply(lambda row:chi_test(row['treatment_ReadHash'],row['control_ReadHash'],row['total_reads_treatment'],row['total_reads_control']),axis=1)
 		dfin.to_csv('temp/out_mutations.txt',index=None,sep='\t')
