@@ -18,7 +18,7 @@ pip install -U textwrap3
 ### ANNOVAR
 Download ANNOVAR from https://www.openbioinformatics.org/annovar/annovar_download_form.php 
 
-convert2annovar.pl is required to run CRISPR-detector.
+convert2annovar.pl is required to run CRISPR-detector.  
 ANNOVAR databases are not required if you are not interest in annotation of variants.
 
 Dowload ANNOVAR database taking hg38 for example  
