@@ -1,40 +1,27 @@
-CRISPR-detector
-====
-
-CRISPR-detector provides a web-hosted platform (https://db.cngb.org/crispr-detector/) and local deployable pipeline to fast and accurately identify and annotate editing-induced mutations from genome editing assays. 
-
-# CRISPR-detector pipeline possesses 5 key innovations :  
-
-1) optimized scalability allowing for whole genome sequencing data analysis beyond BED file-defined regions;   
-2) improved accuracy benefited from haplotype based variant calling to handle sequencing errors;  
-3) treated and control sample co-analysis to remove background variants existing prior to genome editing;  
-4) integrated structural variation (SV) calling with additional focus on vector insertions from viral-mediated genome editing;   
-5) functional and clinical annotation of editing-induced mutations. 
-
-
 ## System requirements
 ### Sentieon module
-Download Sentieon toolkit from
-https://s3.amazonaws.com/sentieon-release/software/sentieon-genomics-202010.03.tar.gz  
-You may request a license by sending emails to huanglei@genomics.cn
-
+Download Sentieon toolkit 
+curl -o sentieon-genomics-202112.05+crispr4.tar.gz ftp://ftp.sentieon.com/download/sentieon-genomics-202112.05+crispr4.tar.gz
+You may request a license by sending emails to frank.hu@sentieon.com
 ```
-export SENTIEON_LICENSE=PATH_TO_SENTIEON/sentieon-genomics-202010.03/localhost_eval.lic  
-export PATH=PATH_TO_SENTIEON/sentieon-genomics-202010.03/bin:$PATH
+export SENTIEON_LICENSE=PATH_TO_SENTIEON_LICENSE/localhost_eval.lic  
+export PATH=PATH_TO_SENTIEON/bin:$PATH
 ```
 
 ### Python packages
 ```
 pip install biopython  
 pip install pyfaidx  
-pip install -U textwrap3  
-conda install blast   
+pip install -U textwrap3    
 ```
 
 ### ANNOVAR
-Download ANNOVAR from
-https://www.openbioinformatics.org/annovar/annovar_download_form.php  
-  
+Download ANNOVAR from https://www.openbioinformatics.org/annovar/annovar_download_form.php 
+
+convert2annovar.pl is required to run CRISPR-detector.
+ANNOVAR databases are not required if you are not interest in annotation of variants.
+
+Dowload ANNOVAR database taking hg38 for example  
 ```
 perl annotate_variation.pl -downdb -webfrom annovar avdblist humandb/ -buildver hg38  
 perl annotate_variation.pl -buildver hg38  -downdb -webfrom annovar refGene humandb/  
@@ -64,6 +51,126 @@ retrieve_seq_from_fasta.pl --format refGene --seqfile GRCz11.fa GRCz11_refGene.t
 makeblastdb -in GRCz11.fa -dbtype nucl  
 ```
 
+# Usage  
+## 1. Single amplicon & pooled amplicons sequencing data analysis
+### 1.1 Mapping reads to amplicons
+```
+python scripts/amplicon/CRISPRdetectorAMPmap.py  
+--o: output path [default:'.']
+--c1: control group fq2 path [optional]
+--c2: control group fq2 path [optional]
+--e1: treatment group fq1 path [required]
+--e2: treatment group fq2 path [optional]
+--sample: sample name & output directory name [required]
+--threads: number of threads to run sentieon minimap2 module [default:1] 
+--cleavage_offset: Center of quantification window to use within respect to the 3-end of the provided sgRNA sequence [dafault=-3]
+--window_size: Defines the size (in bp) of the quantification window extending from the position specified by the cleavage_offset parameter in relation to the 
+	       provided guide RNA sequence, 0 means whole amplicon analysis [default=0]
+--amplicons_file: a tab-delimited text amplicons description file with up to 3 columns: AMPLICON_NAME, AMPLICON_SEQ, gRNA_SEQ_without_PAM(optional) [required]  
+```
+
+### 1.2 Calling variants
+```
+python scripts/amplicon/CRISPRdetectorAMPcall.py 
+--o: output path [default:'.']
+--sample: sample name & output directory name [required] 
+```
+
+### 1.3 Analysis editing outcomes
+```
+python scripts/amplicon/CRISPRdetectorAMPstat.py  
+--o: output path [default='.']
+--sample: sample name & output directory name [required]
+--min_num_of_reads : The minimum number of reads (per locus site) to evaluate [default=100]
+--filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
+--max_pv_active: The maximum pvalue of the statistical difference between treatment and control group sample [default=0.05]
+```
+
+## [Optional] Running TNscope to call out reliable variants
+### 1.4 Calling variants using TNscope
+```
+python scripts/amplicon/CRISPRdetectorAMP_TNscope.py  
+--o: output path [default='.']
+--threads: number of threads [default=1]
+--sample: sample name & output directory name [required]
+--min_tumor_allele_frac: The minimum allelic fraction in treated sample [default=0.005]
+--max_fisher_pv_active: The maximum pvalue of the statistical difference between treated and untreated sample [default=0.05]
+```
+
+### 1.5 annotations of variants called by TNscope using ANNOVAR
+```
+python scripts/amplicon/CRISPRdetectorAMPanno.py  
+--o: output path [default='.']
+--db: ANNOVAR database path [required]
+--fasta: assembly fasta path [required]
+--assembly: assembly version, hg19,hg38 ... [required]
+--sample: sample name & output directory name [required]
+--coordinate_tab: coordinate table for amplicons [required]
+--min_num_of_reads: The minimum number of reads (per site) to evaluate [default=100] 
+--ClinVar: only organism homo sapiens experiment type sequencing data support variant annotations from ClinVar [default=0]  
+```
+
+## 2. Whole genome sequencing data analysis
+### 1.1 Mapping reads to reference genome
+```
+python scripts/WGS/CRISPRdetectorWGSmap.py  
+--o: output path [default:'.']
+--c1: control group fq2 path [optional]
+--c2: control group fq2 path [optional]
+--e1: treatment group fq1 path [required]
+--e2: treatment group fq2 path [optional]
+--fasta: reference genome assembly path [required]
+--sample: sample name & output directory name [required]
+--dedup: Dedup the BAM format file (1) or not (0) [default:1] 
+--threads: number of threads to run sentieon minimap2 module [default:1] 
+```
+
+### 1.2 Calling variants
+```
+python scripts/WGS/CRISPRdetectorWGScall.py
+--o: output path [default='.']
+--bed: BED format file path [optional]
+--threads: number of threads [default=1]
+--assembly: reference genome assembly path [required]
+--sample: sample name & output directory name [required]
+```
+
+### 1.3 Analysis editing outcomes
+```
+python scripts/WGS/CRISPRdetectorWGSstat.py  
+--o: output path [default='.']
+--bed: BED format file path [required]
+--assembly: reference genome assembly path [required]
+--sample: sample name & output directory name [required]
+--min_num_of_reads: The minimum number of reads (per site) to evaluate [default=0]
+--filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
+--max_pv_active: The maximum pvalue of the statistical difference between treatment and control group sample [default=0.05]
+```
+
+## [Optional] Running TNscope to call out reliable variants
+### 1.4 Calling variants using TNscope
+```
+python scripts/WGS/CRISPRdetectorWGS_TNscope.py  
+--o: output path [default='.']
+--bed: BED format file path [optional]
+--threads: number of threads [default=1]
+--fasta: reference genome assembly path [required]
+--sample: sample name & output directory name [required]
+--min_tumor_allele_frac: The minimum allelic fraction in treated sample [default=0.005]
+--max_fisher_pv_active: The maximum pvalue of the statistical difference between treated and untreated sample [default=0.05]
+```
+
+### 1.5 annotations of variants called by TNscope using ANNOVAR
+```
+python scripts/WGS/CRISPRdetectorWGSanno.py  
+--o: output path [default='.']
+--bed: BED format file path [required]
+--db: ANNOVAR database path [required]
+--assembly: assembly version, hg19,hg38 ... [required]
+--sample: sample name & output directory name [required]
+--min_num_of_reads: The minimum number of reads (per site) to evaluate [default=0] 
+--ClinVar: only organism homo sapiens experiment type sequencing data support variant annotations from ClinVar [default=0]  
+```
 ## Citation
 CRISPR-Detector: Fast and Accurate Detection, Visualization, and Annotation of Genome Wide Mutations Induced by Gene Editing Events  
 Lei Huang, Dan Wang, Haodong Chen, Jinnan Hu, Xuechen Dai, Chuan Liu, Anduo Li, Xuechun Shen, Chen Qi, Haixi Sun, Dengwei Zhang, Tong Chen, Yuan Jiang  
