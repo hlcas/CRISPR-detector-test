@@ -27,7 +27,7 @@ Usage:
 python CRISPRdetectorWGSstat.py  
 --o: output path [default='.']
 --bed: BED format file path [required]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 --min_num_of_reads: The minimum number of reads (per site) to evaluate [default=0]
 --filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
@@ -36,10 +36,10 @@ python CRISPRdetectorWGSstat.py
 '''
 
 parse = argparse.ArgumentParser(prog='PROG', formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(description))
-parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--bed", help="BED format file path",required=True)
+parse.add_argument("--o",help='output path',default='.',required=False)
 parse.add_argument("--sample",help="sample name & output dir",required=True)
-parse.add_argument("--assembly",help="genome path in fasta format",required=True)
+parse.add_argument("--fasta",help="genome path in fasta format",required=True)
 parse.add_argument("--min_num_of_reads",help="The minimum number of reads (per site) to evaluate",default=0,type=int)
 parse.add_argument("--filt",help='To filt out background variants applying Chi-square test [1] or not [0]',default=1,required=False)
 parse.add_argument("--max_pv_active",help="The maximum pvalue of the statistical difference between treatment and control group sample",default=0.05,type=float,required=False)
@@ -53,7 +53,7 @@ min_num_of_reads = args.min_num_of_reads
 bed = os.path.abspath(args.bed)
 
 # reference genome assembly
-fasta = os.path.abspath(args.assembly)
+fasta = os.path.abspath(args.fasta)
 fas = Fasta(fasta)
 
 # sample name & output path
