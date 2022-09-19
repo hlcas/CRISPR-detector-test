@@ -131,7 +131,7 @@ python scripts/WGS/CRISPRdetectorWGScall.py
 --o: output path [default='.']
 --bed: BED format file path [optional]
 --threads: number of threads [default=1]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 ```
 
@@ -140,7 +140,7 @@ python scripts/WGS/CRISPRdetectorWGScall.py
 python scripts/WGS/CRISPRdetectorWGSstat.py  
 --o: output path [default='.']
 --bed: BED format file path [required]
---assembly: reference genome assembly path [required]
+--fasta: reference genome assembly path [required]
 --sample: sample name & output directory name [required]
 --min_num_of_reads: The minimum number of reads (per site) to evaluate [default=0]
 --filt: To filt out background variants applying Chi-square test (1) or not (0) [default=1]
