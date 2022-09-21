@@ -3,7 +3,7 @@
 #-------------------------------------------------
 #	   File Name: CRISPRdetectoWGSstat.py
 #	   Description: The script is designed to analyze WGS or Hybrid Capture Panel sequencing data, 
-#                 aiming to compute CRISPR-triggered on/off-target efficiency.
+#                       aiming to compute CRISPR-triggered on/off-target efficiency.
 #	   Author: Lei Huang
 #	   Date: 2022.09.15
 #	   E-mail: huanglei192@mails.ucas.ac.cn
