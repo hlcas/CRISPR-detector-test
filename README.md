@@ -51,6 +51,16 @@ makeblastdb -in GRCz11.fa -dbtype nucl
 
 # Usage  
 ## 1. Single amplicon & pooled amplicons sequencing data analysis
+(1) scripts/amplicon/CRISPRdetectorAMPmap.py is used to mapping sequencing reads to amplicons.  
+(2) scripts/amplicon/CRISPRdetectorAMPcall.py is used to call variants using EditCounterByAllele.  
+(3) scripts/amplicon/CRISPRdetectorAMPstat.py is used to calculate editing activities.  
+(4) scripts/amplicon/CRISPRdetectorAMP_TNscope.py is used to call variants using TNscope.  
+(5) scripts/amplicon/CRISPRdetectorAMPanno.py is used to annotate variants called by TNscope.  
+To calculate editing activity:  
+You should run CRISPRdetectorAMPmap.py, CRISPRdetectorAMPcall.py and CRISPRdetectorAMPstat.py.  
+To call and annotate  reliable variants:  
+You should run CRISPRdetectorAMPmap.py and CRISPRdetectorAMPanno.py  
+
 ### 1.1 Mapping reads to amplicons
 ```
 python scripts/amplicon/CRISPRdetectorAMPmap.py  
@@ -109,6 +119,16 @@ python scripts/amplicon/CRISPRdetectorAMPanno.py
 ```
 
 ## 2. Whole genome sequencing data analysis
+(1) scripts/WGS_or_Hybrid_Capture_Panel/CRISPRdetectorWGSmap.py is used to mapping sequencing reads to reference genome.  
+(2) scripts/WGS_or_Hybrid_Capture_Panel/CRISPRdetectorWGScall.py is used to call variants using EditCounterByAllele.  
+(3) scripts/WGS_or_Hybrid_Capture_Panel/CRISPRdetectorWGSstat.py is used to calculate editing activities if BED format file was provided.  
+(4) scripts/WGS_or_Hybrid_Capture_Panel/CRISPRdetectorWGS_TNscope.py is used to call variants using TNscope.  
+(5) scripts/WGS_or_Hybrid_Capture_Panel/CRISPRdetectorWGSanno.py is used to annotate variants called by TNscope.  
+To calculate editing activity in BED format file defined sites:  
+You should run CRISPRdetectorWGSmap.py, CRISPRdetectorWGScall.py and CRISPRdetectorWGSstat.py.  
+To call and annotate reliable variants:  
+You should run CRISPRdetectorWGSmap.py and CRISPRdetectorWGSanno.py  
+
 ### 2.1 Mapping reads to reference genome
 ```
 python scripts/WGS/CRISPRdetectorWGSmap.py  
