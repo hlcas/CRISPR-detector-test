@@ -252,9 +252,10 @@ for i in sample_list:
 			dfsvR = dfsv[dfsv['region'] == r]
 	
 		df_indel = dfinR[dfinR['diff_len'] != 0]
+		
+		total_indel_nums = 0
 		if len(df_indel) != 0:
 			IndelSize_ReadHash = {}
-			total_indel_nums = 0
 			for l,d in df_indel.groupby('diff_len'):
 				IndelSize_ReadHash[l] = []
 				for t in range(len(d)):
