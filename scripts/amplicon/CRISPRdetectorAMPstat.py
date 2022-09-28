@@ -229,7 +229,7 @@ for i in sample_list:
 
 		if total_indel_nums != 0:
 			with open(j+'/out_normalized_indel_size_ratio_'+i+'.txt','w') as f:
-				f.write('Indel size,Normalized ratio%\n')
+				f.write('Indel size\tNormalized ratio%\n')
 				for t in sorted(IndelSize_ReadHash.keys()):
 					f.write(str(t)+'\t'+str(round(len(IndelSize_ReadHash[t])*100/total_indel_nums,2))+'\n')
 
