@@ -336,19 +336,20 @@ for i in sample_list:
 			WINDOW_INDEL = set(WINDOW_INDEL) | set(POS_INDEL[t])
 			WINDOW_MUT0 = set(WINDOW_MUT0) | set(POS_MUT[t])
 
-		if len(dfsvJ) != 0:
-			for t in range(len(dfsvJ)):
-				sv_start = dfsvJ['Start'].values[t]
-				sv_end_1 = dfsvJ['End'].values[t] + 1
-				if len(set(range(window_start,window_end_1)).intersection(set(range(sv_start,sv_end_1)))) != 0:
-					svReadHashs = dfsvJ[i+'_ReadHash'].values[t].split('|')
-					WINDOW_MUT1 = set(WINDOW_MUT1) | set(WINDOW_MUT0) | set(svReadHashs)
-					WINDOW_NON_REF = set(WINDOW_NON_REF) | set(svReadHashs)
-			try:
-				WINDOW_MUT1.remove('')
-				WINDOW_NON_REF.remove('')
-			except:
-				pass
+		if 'dfsvJ' in dir():
+			if len(dfsvJ) != 0:
+				for t in range(len(dfsvJ)):
+					sv_start = dfsvJ['Start'].values[t]
+					sv_end_1 = dfsvJ['End'].values[t] + 1
+					if len(set(range(window_start,window_end_1)).intersection(set(range(sv_start,sv_end_1)))) != 0:
+						svReadHashs = dfsvJ[i+'_ReadHash'].values[t].split('|')
+						WINDOW_MUT1 = set(WINDOW_MUT1) | set(WINDOW_MUT0) | set(svReadHashs)
+						WINDOW_NON_REF = set(WINDOW_NON_REF) | set(svReadHashs)
+				try:
+					WINDOW_MUT1.remove('')
+					WINDOW_NON_REF.remove('')
+				except:
+					pass
 
 		else:
 			WINDOW_MUT1 = WINDOW_MUT0
