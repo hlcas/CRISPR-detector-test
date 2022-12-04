@@ -14,6 +14,7 @@ import time
 import logging
 import argparse
 import textwrap
+import pandas as pd
 
 description = '''
 ------------------------------------------------------------------------------------------------------------------------
