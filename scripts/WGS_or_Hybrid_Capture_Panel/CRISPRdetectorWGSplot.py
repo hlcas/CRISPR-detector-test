@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
@@ -59,7 +58,8 @@ sns_axes_style={
 }
 
 for i in os.listdir('.'):
-        for j in ['control','treatment']:
+        maxv0 = 1
+        for j in ['treatment','control']:
                 if os.path.exists(i+'/out_nucleotide_frequency_'+j+'.txt'):
                         df = pd.read_csv(i+'/out_nucleotide_frequency_'+j+'.txt',sep='\t')
                         if len(df) != 0:
@@ -85,8 +85,10 @@ for i in os.listdir('.'):
                                 df = df[['Deletions%','Insertions%','Substitutions%']]
                                 df.columns = ['Deletions','Insertions','Substitutions']
                                 maxv = max(df['Substitutions'].max(),df['Insertions'].max(),df['Deletions'].max(),1)
+                                if maxv0 < maxv:
+                                    maxv0 = maxv
                                 sns.set_theme(context=sns_context(7.5),style="darkgrid",font="sans-serif",palette=sns.color_palette("tab10"),rc=sns_axes_style)
-                                plt.ylim([0,maxv*1.1])
+                                plt.ylim([0,maxv0*1.1])
                                 plt.title('Frequency of mutations',fontdict={'fontsize':10})
                                 palette = sns.color_palette("husl", len(df.columns))
                                 g =sns.lineplot(data=df,palette=palette,dashes=False)
