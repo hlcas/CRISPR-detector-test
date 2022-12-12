@@ -89,7 +89,7 @@ for i in os.listdir('.'):
                                     maxv0 = maxv
                                 sns.set_theme(context=sns_context(7.5),style="darkgrid",font="sans-serif",palette=sns.color_palette("tab10"),rc=sns_axes_style)
                                 plt.ylim([0,maxv0*1.1])
-                                plt.title('Frequency of mutations',fontdict={'fontsize':10})
+                                plt.title('Frequency of mutations: '+j,fontdict={'fontsize':10})
                                 palette = sns.color_palette("husl", len(df.columns))
                                 g =sns.lineplot(data=df,palette=palette,dashes=False)
                                 xlab='Position'
