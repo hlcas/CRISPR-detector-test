@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
 #-------------------------------------------------
-#          File Name:           CRISPRdetectorPlot.py
-#          Description:   The script is designed to analyze deep-sequencing PCR products, aiming to compute CRISPR-triggered
-#                                                on-target efficiency.
-#          Author:                 Lei Huang
-#          Date:                         2021.10.20
-#          E-mail:                 huanglei192@mails.ucas.ac.cn
+#          File Name:           CRISPRdetectorWGSplot.py
+#          Author:              Lei Huang
+#          Date:                2021.10.20
+#          E-mail:              huanglei192@mails.ucas.ac.cn
 #-------------------------------------------------
 '''
 
