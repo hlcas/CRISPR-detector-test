@@ -385,7 +385,7 @@ for i in sample_list:
 					WINDOW_NON_REF.remove('')
 				except:
 					pass
-		else:
+		if len(WINDOW_MUT1) == 0:
 			WINDOW_MUT1 = WINDOW_MUT0
 			
 		regionMut[r]['S'] = len(WINDOW_SUB)
