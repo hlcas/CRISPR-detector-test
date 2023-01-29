@@ -345,13 +345,14 @@ for i in sample_list:
 						svReadHashs = dfsvJ[i+'_ReadHash'].values[t].split('|')
 						WINDOW_MUT1 = set(WINDOW_MUT1) | set(WINDOW_MUT0) | set(svReadHashs)
 						WINDOW_NON_REF = set(WINDOW_NON_REF) | set(svReadHashs)
+
 				try:
 					WINDOW_MUT1.remove('')
 					WINDOW_NON_REF.remove('')
 				except:
 					pass
 
-		else:
+		if len(WINDOW_MUT1) == 0:
 			WINDOW_MUT1 = WINDOW_MUT0
 
 		SiteMut[j]['S'] = len(WINDOW_SUB)
